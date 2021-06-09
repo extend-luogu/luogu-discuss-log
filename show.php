@@ -506,6 +506,11 @@ if ($arr['content'] == 'None') {
     body {
         background: aliceblue;
     }
+
+    pre,
+    code {
+        white-space: pre-wrap;
+    }
     </style>
     <?php require_once('footer.php'); ?>
 </body>
