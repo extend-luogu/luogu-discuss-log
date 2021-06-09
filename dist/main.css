@@ -209,3 +209,8 @@ a {
 body {
 	background: aliceblue;
 }
+
+pre,
+code {
+    white-space: pre-wrap;
+}
