@@ -113,7 +113,7 @@ if ($arr['content'] == 'None') {
                         &nbsp;&nbsp;
                         <a href="javascript: update('<?php echo $url; ?>')" id="update">点此更新</a>
                         &nbsp;&nbsp;
-                        总访问数:<?php echo $arr['click'] + 1; ?>
+                        总访问数:<?php echo $arr['click']; ?>
                         &nbsp;&nbsp;
                         上次更新:<?php echo $timstr; ?>
                     </strong>

@@ -21,6 +21,18 @@ if ($r = save($thread, $page, $cnt))
 else
     echo 'failed';
 
+$arr = $link->query("select * from discuss_log where thread=$thread and page=$page")->fetch_assoc();
+
+$r0 = $link->query("select title from discuss_count where thread=$thread");
+if ($r0->num_rows) {
+    $as = $r0->fetch_assoc();
+    if ($as['title'] == '' && $arr['title'] != '')
+        $link->query("update discuss_count set title = \"" . $arr['title'] . "\" where thread=$thread");
+    $link->query("update discuss_count set click = click + 1 where thread = $thread");
+} else {
+    $link->query("insert into discuss_count values  ($thread, 1, \"" . $arr["title"] . "\")");
+}
+
 if (!$r || $cnt < 11) die();
 
 /* begin close the connection to the browser */
