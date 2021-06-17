@@ -70,6 +70,11 @@ if ($arr['content'] == 'None') {
     <link rel="stylesheet" href="/dist/katex.min.css" />
     <script defer src="/dist/katex.min.js"></script>
     <script defer src="/dist/auto-render.min.js"></script>
+    <link href="/dist/lghljs.css" rel="stylesheet">
+    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.0.1/highlight.min.js"></script>
+    <script>
+    hljs.initHighlightingOnLoad();
+    </script>
     <script>
     document.addEventListener("DOMContentLoaded", function() {
         renderMathInElement(document.body, {
@@ -509,7 +514,6 @@ if ($arr['content'] == 'None') {
 
     pre,
     code {
-        font-size: 15px;
         white-space: pre-wrap;
     }
     </style>
