@@ -56,4 +56,4 @@ $cnt = 0;
         </div>
     </div>
     <?php require_once('footer.php'); ?>
-</body
+</body>
