@@ -36,7 +36,7 @@
 
 ## 自己部署
 
-导入`import.sql`, 更改`config.php`里的密码和用户名数据库为你的, 最后把所有文件传到你的服务器里
+导入`import.sql`, 更改`default_config.php`里的密码和用户名数据库为你的, 并更名其为`config.php`, 最后把所有文件传到你的服务器里
 
 推荐使用[OIerbbs cloud](https://idc.oierbbs.fun/)
 
