@@ -16,6 +16,8 @@ parse_str($parsed['query'], $out);
 $page = intval($out['page']);
 if ($page == 0) $page = 1;
 
+if ($thread > $st_thread) die('帖子超出时间范围');
+
 if ($r = save($thread, $page, $cnt))
     echo 'success';
 else
