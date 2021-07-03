@@ -1,7 +1,7 @@
 <?php
 
 require_once('config.php');
-require_once('get.php');
+require_once('lib.php');
 
 if (!isset($_GET['url'])) die('请输入url');
 
@@ -16,24 +16,14 @@ parse_str($parsed['query'], $out);
 $page = intval($out['page']);
 if ($page == 0) $page = 1;
 
-if ($thread > $st_thread) die('帖子超出时间范围');
+if ($thread < $st_thread) die('帖子超出时间范围');
 
 if ($r = save($thread, $page, $cnt))
     echo 'success';
 else
     echo 'failed';
 
-$arr = $link->query("select * from discuss_log where thread=$thread and page=$page")->fetch_assoc();
-
-$r0 = $link->query("select title from discuss_count where thread=$thread");
-if ($r0->num_rows) {
-    $as = $r0->fetch_assoc();
-    if ($as['title'] == '' && $arr['title'] != '')
-        $link->query("update discuss_count set title = \"" . $arr['title'] . "\" where thread=$thread");
-    $link->query("update discuss_count set click = click + 1 where thread = $thread");
-} else {
-    $link->query("insert into discuss_count values  ($thread, 1, \"" . $arr["title"] . "\")");
-}
+addClick($thread, $arr['title']);
 
 if (!$r || $cnt < 11) die();
 
