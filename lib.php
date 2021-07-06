@@ -3,7 +3,7 @@ require_once('config.php');
 
 function compress($content)
 {
-    preg_replace('/<article class="am-comment am-comment-danger" data-reply-count="40">\n<div class="lg-left">/', '\x021', $content);
+    preg_replace('/<article class="am-comment am-comment-danger" data-reply-count="\d+">\n<div class="lg-left">/', '\x021', $content);
     return $content;
 }
 

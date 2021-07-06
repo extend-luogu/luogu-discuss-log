@@ -1,6 +1,7 @@
 <?php
 
 require_once('config.php');
+require_once('lib.php');
 
 if (!isset($_GET['url']) && (!isset($_GET['thread']) || !isset($_GET['page']))) {
     header('HTTP/1.1 404 Not Found');

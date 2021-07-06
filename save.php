@@ -23,6 +23,7 @@ if ($r = save($thread, $page, $cnt))
 else
     echo 'failed';
 
+$arr = $link->query("select * from discuss_log where thread=$thread and page=$page")->fetch_assoc();
 addClick($thread, $arr['title']);
 
 if (!$r || $cnt < 11) die();
