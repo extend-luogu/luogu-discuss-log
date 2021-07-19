@@ -3,6 +3,7 @@
 $pgsiz = 20;
 
 require_once('config.php');
+session_start();
 
 $cnt = 0;
 $pg = intval($_GET['page']);
@@ -46,27 +47,29 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
             <div class="col-sm-12">
                 <div class="lg-content-table-left">
                     <?php foreach ($arr as $va) { ?>
-                    <div class="am-g lg-table-bg0 lg-table-row">
-                        <div class="am-u-md-6">
-                            <?php echo $jmp + (++$cnt); ?>
-                            <a
-                                href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
-                            <br />
-                            <span class="lg-small">id: <?php echo $va['thread']; ?>
-                            </span>
+                        <div class="am-g lg-table-bg0 lg-table-row">
+                            <div class="am-u-md-6">
+                                <?php echo $va['thread'];
+                                ++$cnt; ?>
+                                <a href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
+                                <br />
+                                <span class="lg-small">访问: <?php echo $va['click']; ?> </span>
+                                <?php if (isset($_SESSION['admin'])) { ?>
+                                    <a class="lg-small" href="javascript: del(<?php echo $va['thread'] ?>)">删除</a>
+                                <?php } ?>
+                            </div>
                         </div>
-                    </div>
                     <?php } ?>
 
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($pg > 1) { ?>
-                            <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
-                            </li>
+                                <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
+                                </li>
                             <?php }
                             if ($cnt == $pgsiz) { ?>
-                            <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
-                            </li>
+                                <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
+                                </li>
                             <?php } ?>
                         </ul>
                     </div>
@@ -74,5 +77,12 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
             </div>
         </div>
     </div>
+    <?php if (isset($_SESSION['admin'])) { ?>
+        <script>
+            function del(thread) {
+                $.get(`/delete.php?thread=${thread}`).then((u) => swal(u))
+            }
+        </script>
+    <?php } ?>
     <?php require_once('footer.php'); ?>
 </body>
