@@ -55,7 +55,6 @@ $arr['content'] = decompress($arr['content']);
     <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
     <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script src="/dist/sweetalert2@10.js"></script>
     <link rel="stylesheet" href="/dist/katex.min.css" />
     <script defer src="/dist/katex.min.js"></script>

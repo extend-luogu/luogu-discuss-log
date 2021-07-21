@@ -61,27 +61,26 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
             <div class="col-sm-12">
                 <div class="lg-content-table-left">
                     <?php foreach ($arr as $va) { ?>
-                    <div class="am-g lg-table-bg0 lg-table-row">
-                        <div class="am-u-md-6">
-                            <?php echo $jmp + (++$cnt); /* count */ ?>
-                            <a
-                                href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
-                            <br />
-                            <span class="lg-small">id: <?php echo $va['thread']; ?>
-                            </span>
+                        <div class="am-g lg-table-bg0 lg-table-row">
+                            <div class="am-u-md-6">
+                                <?php echo $jmp + (++$cnt); /* count */ ?>
+                                <a href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
+                                <br />
+                                <span class="lg-small">id: <?php echo $va['thread']; ?>
+                                </span>
+                            </div>
                         </div>
-                    </div>
                     <?php } ?>
 
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($pg > 1) { ?>
-                            <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
-                            </li>
+                                <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
+                                </li>
                             <?php }
                             if ($cnt == $pgsiz) { ?>
-                            <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
-                            </li>
+                                <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
+                                </li>
                             <?php } ?>
                         </ul>
                     </div>
