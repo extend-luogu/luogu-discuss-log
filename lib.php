@@ -44,6 +44,8 @@ function save($thread, $page, &$cnt)
     preg_match('/<h1>([\d\D]+?)<\/h1>/', $cont, $title);
     $title = $title[1];
 
+    $res = str_replace('href="/', 'href="https://www.luogu.com.cn/', $res);
+
     $res = $link->real_escape_string(compress($res));
     $title = $link->real_escape_string($title);
 
