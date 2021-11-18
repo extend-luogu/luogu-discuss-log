@@ -15,18 +15,23 @@ require_once('config.php');
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top" style="box-shadow: 0px 1px 3px 0px black;">
-        <a class="navbar-brand" href="/">洛谷帖子</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/list.php">列表</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/rank.php">排行</a>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top vluogu-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">洛谷帖子</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list.php">列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rank.php">排行</a>
+                </li>
+            </ul>
+        </div>
     </nav>
-    <div class="container" style="transform: translateY(calc(100%));">
+    <div class="container" style="margin-top: 10%; margin-bottom: 15%;">
         <div class="row">
             <div class="col-sm-12 text-center">
                 <br />
@@ -38,7 +43,7 @@ require_once('config.php');
                         <div data-v-a7f7c968="" data-v-c68c4f54="" class="refined-input input-wrap frame"
                             placeholder="请输入帖子链接URL" data-v-72107c51="">
                             <input data-v-a7f7c968="" type="text" placeholder="请输入帖子链接URL"
-                                value="https://www.luogu.com.cn/discuss/show/317505" class="lfe-form-sz-middle">
+                                value="https://www.luogu.com.cn/discuss/317505" class="lfe-form-sz-middle">
                         </div>
                         <button data-v-370e72e2="" data-v-c68c4f54="" type="button" class="lfe-form-sz-middle"
                             data-v-72107c51=""
@@ -58,11 +63,5 @@ require_once('config.php');
         else window.location.href = '/search.php?s=' + $('input').val();
     })
     </script>
-    <style>
-    .jumbotron {
-        bottom: 0;
-        position: fixed;
-    }
-    </style>
     <?php require_once('footer.php'); ?>
 </body>
