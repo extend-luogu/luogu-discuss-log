@@ -21,7 +21,7 @@ if (isset($_GET['url'])) {
 
 $arr = $link->query("select * from discuss_log where thread=$thread and page=$page")->fetch_assoc();
 
-$url = "https://www.luogu.com.cn/discuss/show/$thread?page=$page";
+$url = "https://www.luogu.com.cn/discuss/$thread?page=$page";
 
 $arr['click'] = addClick($thread, $arr['title']);
 
@@ -59,6 +59,7 @@ $arr['content'] = decompress($arr['content']);
     <link rel="stylesheet" href="/dist/katex.min.css" />
     <script defer src="/dist/katex.min.js"></script>
     <script defer src="/dist/auto-render.min.js"></script>
+    <link href="/dist/main.css" rel="stylesheet">
     <link href="/dist/lghljs.css" rel="stylesheet">
     <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
     <script>
@@ -85,16 +86,21 @@ $arr['content'] = decompress($arr['content']);
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top" style="box-shadow: 0px 1px 3px 0px black;">
-        <a class="navbar-brand" href="/">洛谷帖子</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/list.php">列表</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/rank.php">排行</a>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top vluogu-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">洛谷帖子</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list.php">列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rank.php">排行</a>
+                </li>
+            </ul>
+        </div>
     </nav>
     <div class="container" style="margin-top:80px">
         <div class="row">
@@ -102,21 +108,11 @@ $arr['content'] = decompress($arr['content']);
                 <h1><?php echo $arr['title']; ?></h1>
                 <hr />
                 <div class="lfe-body">
-                    <strong>
-                        <a href="<?php echo $url; ?>">原帖</a>
-                        &nbsp;&nbsp;
-                        <a href="javascript: update('<?php echo $url; ?>')" id="update">点此更新</a>
-                        &nbsp;&nbsp;
-                        总访问数:<?php echo $arr['click']; ?>
-                        &nbsp;&nbsp;
-                        上次更新:<?php echo $timstr; ?>
-                    </strong>
-                    <br /><br />
                     <?php echo $arr['content']; ?>
                     <?php if ($arr['content'] == '') { ?>
                         <div align="center">
-                            <script src="https://down.52pojie.cn/.fancyindex/js/phaser.min.js"></script>
-                            <script src="https://down.52pojie.cn/.fancyindex/js/catch-the-cat.js"></script>
+                            <script src="/dist/phaser.min.js"></script>
+                            <script src="/dist/catch-the-cat.js"></script>
                             <div id="catch-the-cat"></div>
                             <script>
                                 window.game = new CatchTheCatGame({
@@ -140,14 +136,26 @@ $arr['content'] = decompress($arr['content']);
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($page > 1) { ?>
-                                <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $thread; ?>?page=<?php echo $page - 1; ?>">&lt;</a>
+                                <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page - 1; ?>"><</a>
                                 </li>
                             <?php } ?>
-                            <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $thread; ?>?page=<?php echo $page + 1; ?>">&gt;</a>
+                            <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page + 1; ?>">></a>
                             </li>
                         </ul>
                     </div>
                 </div>
+            </div>
+            <div class="col-sm-4">
+                 <div class="card">
+                     <div class="card-body">
+                     <b class="float-left">总访问数:</b><span class="float-right"><?php echo $arr['click']; ?></span><br>
+                     <b class="float-left">上次更新:</b><span class="float-right"><?php echo $timstr; ?></span>
+                     </div>
+                     <ul class="contest-menu" style="box-shadow:none">
+                         <li><a href="<?php echo $url; ?>">原帖</a></li>
+                         <li><a href="javascript: update('<?php echo $url; ?>')" id="update">更新</a></li>
+                     </ul>
+                 </div>
             </div>
         </div>
     </div>
@@ -493,10 +501,6 @@ $arr['content'] = decompress($arr['content']);
             font-size: 16px;
             line-height: 1.5;
             color: rgba(0, 0, 0, 0.75);
-        }
-
-        body {
-            background: aliceblue;
         }
 
         pre,
