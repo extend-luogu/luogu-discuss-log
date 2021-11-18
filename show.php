@@ -111,8 +111,8 @@ $arr['content'] = decompress($arr['content']);
                     <?php echo $arr['content']; ?>
                     <?php if ($arr['content'] == '') { ?>
                         <div align="center">
-                            <script src="/dist/phaser.min.js"></script>
-                            <script src="/dist/catch-the-cat.js"></script>
+                            <script src="https://down.52pojie.cn/.fancyindex/js/phaser.min.js"></script>
+                            <script src="https://down.52pojie.cn/.fancyindex/js/catch-the-cat.js"></script>
                             <div id="catch-the-cat"></div>
                             <script>
                                 window.game = new CatchTheCatGame({
@@ -136,10 +136,10 @@ $arr['content'] = decompress($arr['content']);
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($page > 1) { ?>
-                                <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page - 1; ?>"><</a>
+                                <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page - 1; ?>">&lt;</a>
                                 </li>
                             <?php } ?>
-                            <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page + 1; ?>">></a>
+                            <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page + 1; ?>">&gt;</a>
                             </li>
                         </ul>
                     </div>
