@@ -80,11 +80,11 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($pg > 1) { ?>
-                                <li><a href="/list.php?page=<?php echo $pg - 1; ?>"><</a>
+                                <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
                                 </li>
                             <?php }
                             if ($cnt == $pgsiz) { ?>
-                                <li><a href="/list.php?page=<?php echo $pg + 1; ?>">></a>
+                                <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
                                 </li>
                             <?php } ?>
                         </ul>
