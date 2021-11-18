@@ -31,16 +31,21 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top" style="box-shadow: 0px 1px 3px 0px black;">
-        <a class="navbar-brand" href="/">洛谷帖子</a>
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link active" href="/list.php">列表</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/rank.php">排行</a>
-            </li>
-        </ul>
+    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top vluogu-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">洛谷帖子</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/list.php">列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rank.php">排行</a>
+                </li>
+            </ul>
+        </div>
     </nav>
     <div class="container" style="margin-top:80px">
         <div class="row">
@@ -51,7 +56,7 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
                             <div class="am-u-md-6">
                                 <?php echo $va['thread'];
                                 ++$cnt; ?>
-                                <a href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
+                                <a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
                                 <br />
                                 <span class="lg-small">访问: <?php echo $va['click']; ?> </span>
                                 <?php if (isset($_SESSION['admin'])) { ?>
