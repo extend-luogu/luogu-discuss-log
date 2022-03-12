@@ -1,37 +1,17 @@
 <?php
 require_once('config.php');
+header("Cache-control: max-age=3600");
 ?>
 
 <!DOCTYPE html>
 
 <head>
     <title>洛谷帖子保存站</title>
-    <link rel="shortcut icon" type="image/x-icon" href="//www.luogu.com.cn/favicon.ico" media="screen" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/dist/main.css" />
+    <?php require_once 'header.php'; ?>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top vluogu-navbar">
-        <div class="container">
-            <a class="navbar-brand" href="/">洛谷帖子</a>
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" href="/">首页</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/list.php">列表</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/rank.php">排行</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <div class="container" style="margin-top: 10%; margin-bottom: 15%;">
+    <div class="container mainindex">
         <div class="row">
             <div class="col-sm-12 text-center">
                 <br />
@@ -57,11 +37,41 @@ require_once('config.php');
             </div>
         </div>
     </div>
+    <nav class="navbar navbar-expand-sm bg-light navbar-light fixed-top vluogu-navbar">
+        <div class="container">
+            <a class="navbar-brand" href="/">洛谷帖子</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/">首页</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/list.php">列表</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/rank.php">排行</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
     <script>
     $('button').click(() => {
         if ($('input').val() == '') window.alert('请输入链接URL');
         else window.location.href = '/search.php?s=' + $('input').val();
     })
     </script>
+    <style>
+    .jumbotron {
+        bottom: 0;
+        position: fixed;
+    }
+    .mainindex {
+        width: 800px;
+        height: 400px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    </style>
     <?php require_once('footer.php'); ?>
 </body>

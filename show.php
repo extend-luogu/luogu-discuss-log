@@ -2,6 +2,10 @@
 
 require_once('config.php');
 require_once('lib.php');
+session_cache_limiter('private');
+session_start();
+
+header("Cache-control: max-age=60");
 
 if (!isset($_GET['url']) && (!isset($_GET['thread']) || !isset($_GET['page']))) {
     header('HTTP/1.1 404 Not Found');
@@ -9,31 +13,36 @@ if (!isset($_GET['url']) && (!isset($_GET['thread']) || !isset($_GET['page']))) 
 }
 
 $thread = intval($_GET['thread']);
-$page = intval($_GET['page']);
+$pg = intval($_GET['page']);
 
 if (isset($_GET['url'])) {
     $parsed = parse_url($_GET['url']);
     $thread = intval(basename($parsed['path']));
     parse_str($parsed['query'], $out);
-    $page = intval($out['page']);
-    if ($page == 0) $page = 1;
+    $pg = intval($out['page']);
+    if ($pg == 0) $pg = 1;
 }
 
-$arr = $link->query("select * from discuss_log where thread=$thread and page=$page")->fetch_assoc();
+$arr = $link->query("select * from discuss_log where thread=$thread and page=$pg")->fetch_assoc();
 
-$url = "https://www.luogu.com.cn/discuss/$thread?page=$page";
+$url = "https://www.luogu.com.cn/discuss/$thread?page=$pg";
 
-$arr['click'] = addClick($thread, $arr['title']);
+$arr['click'] = addClick($thread);
+$tq = $link->query("select reply_count, title from discuss_count where thread=$thread");
 
-$link->close();
 
 date_default_timezone_set("Asia/Shanghai");
 $tim = strtotime($arr['time']);
 $timstr = date('Y-m-d H:i:s', strtotime("+0 hours", $tim)); // time adjust
 
-if (!$arr['title']) {
+
+if (!$tq->num_rows) {
     $arr['title'] = '还未保存过QwQ, 请点击下方更新以保存';
     $timstr = '将来某时';
+} else {
+    $rs = $tq->fetch_assoc();
+    $arr['title'] = $rs['title'];
+    $arr['reply_count'] = $rs['reply_count'];
 }
 
 if ($arr['content'] == 'None') {
@@ -41,8 +50,31 @@ if ($arr['content'] == 'None') {
     $arr['content'] = '';
 }
 
+$pgs = 1;
+
+if ($arr['reply_count'] == -1) {
+    $pgs = $link->query("select count(*) from discuss_log where thread = $thread")->fetch_row()[0];
+    $arr['reply_count'] = 'N/A';
+} else {
+    $pgs = intval(($arr['reply_count'] - 1) / 10) + 1; 
+}
+
+$link->close();
+
 $arr['content'] = decompress($arr['content']);
 
+if (isset($_GET['_contentOnly'])) {
+    $rs = array(
+        'content' => $arr['content'],
+        'title' => $arr['title'],
+    );
+    die(json_encode($rs));
+}
+
+function pageLink($p) {
+    global $thread;
+    echo "/show.php?url=https://www.luogu.com.cn/discuss/$thread?page=$p";
+}
 
 ?>
 
@@ -50,38 +82,23 @@ $arr['content'] = decompress($arr['content']);
 
 <head>
     <title><?php echo $arr['title']; ?></title>
-    <link rel="shortcut icon" type="image/x-icon" href="//www.luogu.com.cn/favicon.ico" media="screen" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="/dist/sweetalert2@10.js"></script>
-    <link rel="stylesheet" href="/dist/katex.min.css" />
-    <script defer src="/dist/katex.min.js"></script>
-    <script defer src="/dist/auto-render.min.js"></script>
-    <link href="/dist/main.css" rel="stylesheet">
-    <link href="/dist/lghljs.css" rel="stylesheet">
-    <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <?php require_once 'header.php'; ?>
     <script>
-        hljs.initHighlightingOnLoad();
-    </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            renderMathInElement(document.body, {
-                delimiters: [{
-                        left: '$$',
-                        right: '$$',
-                        display: true
-                    },
-                    {
-                        left: '$',
-                        right: '$',
-                        display: false
-                    }
-                ],
-                throwOnError: false
-            });
+    hljs.initHighlightingOnLoad();
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            delimiters: [{
+                left: '$$',
+                right: '$$',
+                display: true
+            }, {
+                left: '$',
+                right: '$',
+                display: false
+            }],
+            throwOnError: false
         });
+    });
     </script>
 </head>
 
@@ -105,408 +122,159 @@ $arr['content'] = decompress($arr['content']);
     <div class="container" style="margin-top:80px">
         <div class="row">
             <div class="col-sm-8">
-                <h1><?php echo $arr['title']; ?></h1>
+                <h2><?php echo $arr['title']; ?></h2>
                 <hr />
                 <div class="lfe-body">
                     <?php echo $arr['content']; ?>
                     <?php if ($arr['content'] == '') { ?>
-                        <div align="center">
-                            <script src="https://down.52pojie.cn/.fancyindex/js/phaser.min.js"></script>
-                            <script src="https://down.52pojie.cn/.fancyindex/js/catch-the-cat.js"></script>
-                            <div id="catch-the-cat"></div>
-                            <script>
-                                window.game = new CatchTheCatGame({
-                                    w: 12,
-                                    h: 11,
-                                    r: 20,
-                                    backgroundColor: 16777215,
-                                    parent: "catch-the-cat",
-                                    statusBarAlign: "center",
-                                    credit: "luogulo.gq",
-                                });
-                            </script>
-                            <style type="text/css">
-                                .style9 {
-                                    font-size: 24px;
-                                    font-family: "楷体_GB2312";
-                                }
-                            </style>
-                        </div>
-                    <?php } ?>
-                    <div class="pagination-centered">
-                        <ul class="am-pagination am-pagination-centered">
-                            <?php if ($page > 1) { ?>
-                                <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page - 1; ?>">&lt;</a>
-                                </li>
-                            <?php } ?>
-                            <li><a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $thread; ?>?page=<?php echo $page + 1; ?>">&gt;</a>
-                            </li>
-                        </ul>
+                    <div align="center">
+                        <script src="https://down.52pojie.cn/.fancyindex/js/phaser.min.js"></script>
+                        <script src="https://down.52pojie.cn/.fancyindex/js/catch-the-cat.js"></script>
+                        <div id="catch-the-cat"></div>
+                        <script>
+                        window.game = new CatchTheCatGame({
+                            w: 12,
+                            h: 11,
+                            r: 20,
+                            backgroundColor: 16777215,
+                            parent: "catch-the-cat",
+                            statusBarAlign: "center",
+                            credit: "luogulo.gq",
+                        });
+                        </script>
+                        <style type="text/css">
+                        .style9 {
+                            font-size: 24px;
+                            font-family: "楷体_GB2312";
+                        }
+                        </style>
                     </div>
+                    <?php } ?>
+                    <ul class="pagination justify-content-center">
+                        <?php if ($pg > 1) { ?>
+                        <li class="page-item"><a class="page-link" href="<?php pageLink(1); ?>">«</a></li>
+                        <?php } ?>
+                        <?php 
+                            for ($x = 1; $pg - $x > 1; $x *= 2) ;
+                            for ($x /= 2; $x >= 1; $x /= 2) { 
+                        ?>
+                        <li class="page-item"><a class="page-link" href="<?php pageLink($pg - $x); ?>"><?php echo $pg - $x; ?></a></li>
+                        <?php } ?>
+                        <li class="page-item active"><a class="page-link" href="#"><?php echo $pg; ?></a></li>
+                        <?php for ($x = 1; $pg + $x < $pgs; $x *= 2) { ?>
+                        <li class="page-item"><a class="page-link" href="<?php pageLink($pg + $x); ?>"><?php echo $pg + $x; ?></a></li>
+                        <?php } ?>
+                        <?php if ($pg < $pgs) { ?>
+                        <li class="page-item"><a class="page-link" href="<?php pageLink($pgs); ?>">»</a></li>
+                        <?php } ?>
+                    </ul>
                 </div>
             </div>
             <div class="col-sm-4">
-                 <div class="card">
-                     <div class="card-body">
-                     <b class="float-left">总访问数:</b><span class="float-right"><?php echo $arr['click']; ?></span><br>
-                     <b class="float-left">上次更新:</b><span class="float-right"><?php echo $timstr; ?></span>
-                     </div>
-                     <ul class="contest-menu" style="box-shadow:none">
-                         <li><a href="<?php echo $url; ?>">原帖</a></li>
-                         <li><a href="javascript: update('<?php echo $url; ?>')" id="update">更新</a></li>
-                     </ul>
-                 </div>
+                <section style="background-color: #ffffff;padding: 10px 10px;box-shadow: 0 3px 5px rgb(50 50 93 / 10%), 0 2px 3px rgb(0 0 0 / 8%);">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th>访问</th>
+                                <td><?php echo $arr['click']; ?></td>
+                            </tr>
+                            <tr>
+                                <th>页数</th>
+                                <td><?php echo $pgs; ?></td>
+                            </tr>
+                            <tr>
+                                <th>回复</th>
+                                <td><?php echo $arr['reply_count']; ?></td>
+                            </tr>
+                            <tr>
+                                <th>更新</th>
+                                <td><?php echo $timstr; ?></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a href="<?php echo $url; ?>" class="btn btn-primary" target="_blank">原帖</a>
+                    <button type="button" onclick="update('<?php echo $url; ?>')" id="update"
+                        class="btn btn-success">点此更新</button>
+                    <?php if (isset($_SESSION['admin'])) { ?>
+                    <button type="button" class="btn btn-danger" onclick="del(<?php echo $thread; ?>)">
+                        删除
+                    </button>
+                    <?php } ?>
+                    <!-- 按钮：用于打开模态框 -->
+                    <button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal"
+                        id="openUserGuide">
+                        用户指南
+                    </button>
+
+                    <!-- 模态框 -->
+                    <div class="modal fade" id="myModal">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+
+                                <!-- 模态框头部 -->
+                                <div class="modal-header">
+                                    <h4 class="modal-title">用户指南</h4>
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                </div>
+
+                                <!-- 模态框主体 -->
+                                <div class="modal-body" id="userguide">
+                                </div>
+
+                                <!-- 模态框底部 -->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
     <script>
-        $("img").each((v, u) => {
-            let url = new URL(u.src);
-            if (url.hostname == "cdn.luogu.com.cn")
-                u.src = '/img.php?url=' + u.src;
-        });
-        $('article a').each((v, u) => {
-            if (u.href.includes('https://luogulo.gq/')) u.href = u.href.replace('https://luogulo.gq/',
-                'https://www.luogu.com.cn/');
-        })
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
+    let isUpdating = 0;
 
-        function update(url) {
-            let h = $('#update').text("正在更新").attr('href');
-            $('#update').removeAttr('href');
-            $.get(`/save.php?url=${url}`).then((u) => {
-                if (u == 'success')
-                    Toast.fire({
-                        icon: "success",
-                        title: "更新成功",
-                    }).then(() => location.reload());
-                else Toast.fire({
-                    icon: "error",
-                    title: "更新失败, 帖子已被删除",
-                })
-                $('#update').text("点此更新").attr('href', h);
-            });
-        }
+    function update(url) {
+        if (isUpdating)
+            return;
+        isUpdating = 1
+        let h = $('#update').text("正在更新").attr('href');
+        $('#update').addClass('disabled');
+        $('#update').removeAttr('href');
+        $.get(`/save.php?url=${url}`).then((u) => {
+            if (u == 'success')
+                Toast.fire({
+                    icon: "success",
+                    title: "更新成功",
+                }).then(() => location.reload());
+            else Toast.fire({
+                icon: "error",
+                title: u,
+            })
+            $('#update').text("点此更新").attr('href', h);
+            isUpdating = 0
+            $('#update').removeClass('disabled');
+        });
+    }
     </script>
-
-    <style>
-        .lg-fg-brown {
-            color: #996600 !important;
-        }
-
-        .lg-bg-brown {
-            background-color: #996600;
-        }
-
-        code {
-            font-family: monospace, "Courier New";
-            font-family: monospace, monospace;
-            font-size: 1em;
-            padding: 2px 4px;
-            color: #c7254e;
-            white-space: nowrap;
-            border-radius: 0;
-        }
-
-        code,
-        pre {
-            background-color: #f8f8f8;
-        }
-
-        .am-pagination>li>a,
-        .am-pagination>li>span {
-            position: relative;
-            display: block;
-            padding: .5em 1em;
-            text-decoration: none;
-            line-height: 1.2;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 0;
-            margin-bottom: 5px;
-            margin-right: 5px;
-        }
-
-        .am-pagination>li {
-            display: inline-block;
-        }
-
-        .am-pagination {
-            position: relative;
-            padding-left: 0;
-            margin: 1.5rem 0;
-            list-style: none;
-            color: #999;
-        }
-
-        .am-pagination-centered {
-            text-align: center;
-        }
-
-
-        .am-badge.am-radius {
-            border-radius: 2px;
-        }
-
-        .lg-bg-orange {
-            background-color: #e67e22;
-        }
-
-        .lg-bg-purple {
-            background-color: #8e44ad;
-        }
-
-        .lg-bg-red {
-            background-color: #e74c3c;
-        }
-
-        .am-badge {
-            display: inline-block;
-            min-width: 10px;
-            padding: 0.25em 0.625em;
-            font-size: 0.8rem;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1;
-            vertical-align: baseline;
-            white-space: nowrap;
-        }
-
-        .am-badge,
-        .am-close,
-        .am-icon-btn,
-        .am-icon-fw,
-        .am-icon-li,
-        .am-progress-bar {
-            text-align: center;
-        }
-
-        .lg-fg-purple {
-            color: #8e44ad !important;
-        }
-
-        .am-comment-bd> :last-child {
-            margin-bottom: 0;
-        }
-
-        address,
-        blockquote,
-        dl,
-        fieldset,
-        figure,
-        hr,
-        ol,
-        p,
-        pre,
-        ul {
-            margin: 0 0 1.6rem;
-        }
-
-        .am-comment-bd img {
-            max-width: 100%;
-        }
-
-        img {
-            border-style: none;
-            -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-        }
-
-        .lg-fg-gray {
-            color: #bbb !important;
-        }
-
-        .lg-fg-green {
-            color: #5eb95e !important;
-        }
-
-        .lg-fg-red {
-            color: #e74c3c !important;
-        }
-
-        .lg-bold {
-            font-weight: bold;
-        }
-
-        .lg-fg-orange {
-            color: #e67e22 !important;
-        }
-
-        .am-comment-primary .am-comment-avatar,
-        .am-comment-primary .am-comment-main {
-            border-color: #0e90d2;
-        }
-
-        .am-comment-primary .am-comment-main:before {
-            border-right-color: #0e90d2;
-        }
-
-        .am-comment-danger .am-comment-main:before {
-            border-right-color: #dd514c;
-        }
-
-        .am-comment-main:before {
-            z-index: 1;
-        }
-
-        .am-comment-main:after,
-        .am-comment-main:before {
-            position: absolute;
-            top: 10px;
-            left: -8px;
-            right: 100%;
-            width: 0;
-            height: 0;
-            display: block;
-            content: " ";
-            border-color: transparent;
-            border-style: solid solid outset;
-            border-width: 8px 8px 8px 0;
-            pointer-events: none;
-        }
-
-        .am-comment-main:after {
-            border-right-color: #f8f8f8;
-            margin-left: 1px;
-            z-index: 2;
-        }
-
-        .am-comment-bd {
-            word-break: break-all;
-            background: #ffffff;
-            font-size: 14px;
-            padding: 15px;
-            overflow: hidden;
-        }
-
-        .am-comment-avatar {
-            background-image: url(/images/icon.png);
-            background-size: 48px, 48px;
-            width: 48px;
-            height: 48px;
-            float: left;
-            border-radius: 50%;
-            border: 1px solid transparent;
-        }
-
-
-        .am-btn,
-        img,
-        select {
-            vertical-align: middle;
-        }
-
-        .am-comment-meta a:not([class]) {
-            float: right;
-            font-weight: bold;
-            margin-left: 1em;
-        }
-
-        .am-comment-meta a {
-            color: #999;
-        }
-
-        .am-comment-meta {
-            -webkit-box-flex: 1;
-            -webkit-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-            padding: 10px 15px;
-            line-height: 1.2;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
-        }
-
-        .lg-fg-bluelight {
-            color: #0e90d2 !important;
-        }
-
-        .am-comment-actions,
-        .am-comment-meta {
-            color: #999;
-            font-size: 13px;
-        }
-
-        .am-comment-hd {
-            background: #f8f8f8;
-            border-bottom: 1px solid #eee;
-            display: -webkit-box;
-            display: -webkit-flex;
-            display: -ms-flexbox;
-            display: flex;
-            border-bottom: none;
-        }
-
-        .am-comment-danger .am-comment-avatar,
-        .am-comment-danger .am-comment-main {
-            border-color: #dd514c;
-        }
-
-        .am-comment-main {
-            position: relative;
-            margin-left: 63px;
-            border: 1px solid #dedede;
-            border-radius: 0;
-        }
-
-        a {
-            color: #3498db;
-            text-decoration: none;
-            background-color: transparent;
-        }
-
-        .lg-left {
-            float: left !important;
-        }
-
-        .am-comment {
-            margin-bottom: 25px;
-        }
-
-        article,
-        aside,
-        details,
-        footer,
-        header,
-        summary {
-            display: block;
-        }
-
-        *,
-        :after,
-        :before {
-            box-sizing: border-box;
-        }
-
-        article {
-            display: block;
-        }
-
-        .lfe-body {
-            font-family: -apple-system, BlinkMacSystemFont, "San Francisco",
-                "Helvetica Neue", "Noto Sans", "Noto Sans CJK SC", "Noto Sans CJK",
-                "Source Han Sans", "PingFang SC", "Segoe UI", "Microsoft YaHei",
-                sans-serif;
-            font-size: 16px;
-            line-height: 1.5;
-            color: rgba(0, 0, 0, 0.75);
-        }
-
-        pre,
-        code {
-            white-space: pre-wrap;
-        }
-    </style>
+    <script>
+    $("#openUserGuide").on('click', (e) => {
+        $.get('/userguide.html').then((u) => $("#userguide").html(u));
+    })
+    </script>
+    <?php if (isset($_SESSION['admin'])) { ?>
+    <script>
+    function del(thread) {
+        $.get(`/delete.php?thread=${thread}`).then((u) => {
+            Toast.fire({
+                icon: "success",
+                title: u,
+            }).then(() => history.back());
+        })
+    }
+    </script>
+    <?php } ?>
     <?php require_once('footer.php'); ?>
 </body>

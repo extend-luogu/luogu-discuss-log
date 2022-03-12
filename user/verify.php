@@ -28,13 +28,7 @@ $_SESSION['rndstr'] = $randstr;
 
 <head>
     <title>洛谷帖子保存站 - 验证洛谷账户</title>
-    <link rel="shortcut icon" type="image/x-icon" href="//www.luogu.com.cn/favicon.ico" media="screen" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <script src="/dist/sweetalert2@10.js"></script>
-    <link rel="stylesheet" href="/dist/main.css" />
+    <?php require_once('../header.php'); ?>
 </head>
 
 <body>
@@ -57,52 +51,54 @@ $_SESSION['rndstr'] = $randstr;
                 <p>请将<?php echo $randstr; ?>复制到您个人介绍的开头, 验证结束可以删除</p>
                 <div data-v-c68c4f54="" data-v-796309f8="" class="search-input" align="center">
                     <div data-v-72107c51="" data-v-c68c4f54="" class="input-group search-filter" data-v-796309f8="">
-                        <div data-v-a7f7c968="" data-v-c68c4f54="" class="refined-input input-wrap frame" data-v-72107c51="">
+                        <div data-v-a7f7c968="" data-v-c68c4f54="" class="refined-input input-wrap frame"
+                            data-v-72107c51="">
                             <input data-v-a7f7c968="" type="text" placeholder="请输入您的uid" class="lfe-form-sz-middle">
                         </div>
-                        <button data-v-370e72e2="" data-v-c68c4f54="" type="button" class="lfe-form-sz-middle" data-v-72107c51="" style="border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);">
+                        <button data-v-370e72e2="" data-v-c68c4f54="" type="button" class="lfe-form-sz-middle"
+                            data-v-72107c51=""
+                            style="border-color: rgb(52, 152, 219); background-color: rgb(52, 152, 219);">
                             提交
                         </button>
                     </div>
                 </div>
-                <p>token一直有效, 获取后请妥善保存</p>
                 <div id="show-token"></div>
                 <br /> <br /> <br />
             </div>
         </div>
     </div>
     <script>
-        const Toast = Swal.mixin({
-            toast: true,
-            position: "top-end",
-            showConfirmButton: false,
-            timer: 1000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener("mouseenter", Swal.stopTimer);
-                toast.addEventListener("mouseleave", Swal.resumeTimer);
-            },
-        });
-        $('button').click(() => {
-            if ($('input').val() == '') window.alert('请输入您的uid');
-            else {
-                $.get('/user/verify.php?verify&uid=' + $('input').val())
-                    .then((u) => {
-                        if (u === 'failed')
-                            Toast.fire({
-                                icon: "error",
-                                title: "验证失败",
-                            });
-                        else {
-                            Toast.fire({
-                                icon: "success",
-                                title: "验证成功",
-                            });
-                            $("#show-token").html(`<p>您的token是${u}, <a href="/user/register.php">注册</a></p>`)
-                        }
-                    });
-            }
-        })
+    const toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 1000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener("mouseenter", Swal.stopTimer);
+            toast.addEventListener("mouseleave", Swal.resumeTimer);
+        },
+    });
+    $('button').click(() => {
+        if ($('input').val() == '') window.alert('请输入您的uid');
+        else {
+            $.get('/user/verify.php?verify&uid=' + $('input').val())
+                .then((u) => {
+                    if (u === 'failed')
+                        toast.fire({
+                            icon: "error",
+                            title: "验证失败",
+                        });
+                    else {
+                        toast.fire({
+                            icon: "success",
+                            title: "验证成功",
+                        });
+                        $("#show-token").html(`<p>您的token是${u}</p>`)
+                    }
+                });
+        }
+    })
     </script>
     <?php require_once('../footer.php'); ?>
 </body>

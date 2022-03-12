@@ -1,6 +1,7 @@
 <?php
 
 require_once('config.php');
+header("Cache-control: max-age=60");
 
 $s = $_GET['s'];
 
@@ -36,12 +37,7 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
 
 <head>
     <title>讨论列表</title>
-    <link rel="shortcut icon" type="image/x-icon" href="//www.luogu.com.cn/favicon.ico" media="screen" />
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
-    <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
-    <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" href="/dist/main.css" />
+    <?php require_once 'header.php'; ?>
 </head>
 
 <body>
@@ -66,26 +62,27 @@ while ($assoc = $q->fetch_assoc()) array_push($arr, $assoc);
             <div class="col-sm-12">
                 <div class="lg-content-table-left">
                     <?php foreach ($arr as $va) { ?>
-                        <div class="am-g lg-table-bg0 lg-table-row">
-                            <div class="am-u-md-6">
-                                <?php echo $jmp + (++$cnt); /* count */ ?>
-                                <a href="/show.php?url=https://www.luogu.com.cn/discuss/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
-                                <br />
-                                <span class="lg-small">id: <?php echo $va['thread']; ?>
-                                </span>
-                            </div>
+                    <div class="am-g lg-table-bg0 lg-table-row">
+                        <div class="am-u-md-6">
+                            <?php echo $jmp + (++$cnt); /* count */ ?>
+                            <a
+                                href="/show.php?url=https://www.luogu.com.cn/discuss/show/<?php echo $va['thread']; ?>"><?php echo $va['title']; ?></a>
+                            <br />
+                            <span class="lg-small">id: <?php echo $va['thread']; ?>
+                            </span>
                         </div>
+                    </div>
                     <?php } ?>
 
                     <div class="pagination-centered">
                         <ul class="am-pagination am-pagination-centered">
                             <?php if ($pg > 1) { ?>
-                                <li><a href="/list.php?page=<?php echo $pg - 1; ?>">&lt;</a>
-                                </li>
+                            <li><a href="/list.php?page=<?php echo $pg - 1; ?>"><</a>
+                            </li>
                             <?php }
                             if ($cnt == $pgsiz) { ?>
-                                <li><a href="/list.php?page=<?php echo $pg + 1; ?>">&gt;</a>
-                                </li>
+                            <li><a href="/list.php?page=<?php echo $pg + 1; ?>">></a>
+                            </li>
                             <?php } ?>
                         </ul>
                     </div>
