@@ -1,0 +1,3 @@
+database/
+docker-entrypoint-initdb.d/
+.env
